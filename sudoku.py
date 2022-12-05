@@ -1,4 +1,5 @@
 import pygame
+import time
 from gameboard import GameBoard
 
 BOARD_SIZE = 630
@@ -13,6 +14,8 @@ class Sudoku:
         self.max_board_id = len(self.game.boards[self.difficulty])
         self.x = 0
         self.y = 0
+        self.msg = ""
+        self.set_msg_timer = 0
         self.cell = int(BOARD_SIZE / 9)
         self.box = 3 * self.cell + 1
         self.msg_pos = (10, BOARD_SIZE + 15)
@@ -33,6 +36,11 @@ class Sudoku:
         self.v_background = pygame.Rect((0, 0, BOARD_SIZE, self.cell + 1))
         self.cell_background = pygame.Rect((0, 0, self.cell + 1, self.cell + 1))
         self.box_background = pygame.Rect((0, 0, self.box, self.box))
+    
+    def draw_msg(self):
+        if time.time() - self.set_msg_timer < 5:
+            text = self.msg_font.render(self.msg, 1, (0, 0, 0))
+            self.main_window.blit(text, self.msg_pos)
     
     def draw_title(self):
         self.main_window.fill((255,255,255))
@@ -117,11 +125,11 @@ class Sudoku:
     def try_number(self, number):
         if (self.game.question_board[self.y][self.x] != 0 or 
             self.game.user_board[self.y][self.x] != 0):
-            text = "Choose a different cell."
-            print(text)
+            self.msg = "Choose a different cell."
+            self.set_msg_timer = time.time()
         elif not self.game.validvalue(self.y, self.x, number):
-            text = "Invalid number."
-            print(text)
+            self.msg = "Invalid number."
+            self.set_msg_timer = time.time()
         else:
             self.game.update_cell(self.x, self.y, number)
     
@@ -134,6 +142,7 @@ class Sudoku:
         pygame.draw.rect(self.main_window, (210, 210, 210), self.v_background)
         pygame.draw.rect(self.main_window, (210, 210, 210), self.box_background)
         pygame.draw.rect(self.main_window, (180, 180, 180), self.cell_background)
+        self.draw_msg()
 
     def draw_board(self):
         for i in range(10):
