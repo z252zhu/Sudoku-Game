@@ -80,7 +80,7 @@ class Sudoku:
         text = self.msg_font.render(msg, 1, (0, 0, 0))
         self.main_window.blit(text, self.msg_pos)
     
-    def update_selectionbox(self, x, y, mouse_input):
+    def update_selection_box(self, x, y, mouse_input):
         # mouse input
         if mouse_input:
             if x < BOARD_SIZE and x < BOARD_SIZE:
@@ -114,6 +114,17 @@ class Sudoku:
         self.cell_background.x = self.x * self.cell
         self.cell_background.y = self.y * self.cell
     
+    def try_number(self, number):
+        if (self.game.question_board[self.y][self.x] != 0 or 
+            self.game.user_board[self.y][self.x] != 0):
+            text = "Choose a different cell."
+            print(text)
+        elif not self.game.validvalue(self.y, self.x, number):
+            text = "Invalid number."
+            print(text)
+        else:
+            self.game.update_cell(self.x, self.y, number)
+    
     def draw_selectbox(self):
         pygame.draw.rect(self.main_window, (0, 0, 0), self.selectbox, 1)
     
@@ -146,6 +157,14 @@ class Sudoku:
                         color = (10, 100, 200)
                     text = self.number_font.render(str(self.game.user_board[i][j]), 1, color)
                     self.main_window.blit(text, (j * self.cell + 26, i * self.cell + 20))
+        
+    def reset_sudoku(self):
+        self.difficulty = 0
+        self.board_id = 0
+        self.draw_status = 0
+        self.max_board_id = len(self.game.boards[self.difficulty])
+        self.x = 0
+        self.y = 0
 
 def main():
     sudoku = Sudoku()
@@ -161,6 +180,8 @@ def main():
                         sudoku.draw_status = max(0, sudoku.draw_status - 1)
                     if event.key == pygame.K_RETURN:
                         sudoku.draw_status += 1
+                        if sudoku.draw_status == 2:
+                            sudoku.game.select_board(sudoku.difficulty, sudoku.board_id)
                     if event.key == pygame.K_LEFT:
                         if sudoku.draw_status == 0:
                             sudoku.select_difficulty(-1)
@@ -174,41 +195,40 @@ def main():
             else:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
-                    sudoku.update_selectionbox(pos[0], pos[1], True)
+                    sudoku.update_selection_box(pos[0], pos[1], True)
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_LEFT:
-                        sudoku.update_selectionbox(-1, 0, False)
+                        sudoku.update_selection_box(-1, 0, False)
                     if event.key == pygame.K_RIGHT:
-                        sudoku.update_selectionbox(1, 0, False)
+                        sudoku.update_selection_box(1, 0, False)
                     if event.key == pygame.K_UP:
-                        sudoku.update_selectionbox(0, -1, False)
+                        sudoku.update_selection_box(0, -1, False)
                     if event.key == pygame.K_DOWN:
-                        sudoku.update_selectionbox(0, 1, False)
+                        sudoku.update_selection_box(0, 1, False)
                     if event.key == pygame.K_BACKSPACE:
                         sudoku.game.update_cell(sudoku.x, sudoku.y, 0)
                     if event.key == pygame.K_1:
-                        sudoku.game.update_cell(sudoku.x, sudoku.y, 1)
+                        sudoku.try_number(1)
                     if event.key == pygame.K_2:
-                        sudoku.game.update_cell(sudoku.x, sudoku.y, 2)
+                        sudoku.try_number(2)
                     if event.key == pygame.K_3:
-                        sudoku.game.update_cell(sudoku.x, sudoku.y, 3)
+                        sudoku.try_number(3)
                     if event.key == pygame.K_4:
-                        sudoku.game.update_cell(sudoku.x, sudoku.y, 4)
+                        sudoku.try_number(4)
                     if event.key == pygame.K_5:
-                        sudoku.game.update_cell(sudoku.x, sudoku.y, 5)
+                        sudoku.try_number(5)
                     if event.key == pygame.K_6:
-                        sudoku.game.update_cell(sudoku.x, sudoku.y, 6)
+                        sudoku.try_number(6)
                     if event.key == pygame.K_7:
-                        sudoku.game.update_cell(sudoku.x, sudoku.y, 7)
+                        sudoku.try_number(7)
                     if event.key == pygame.K_8:
-                        sudoku.game.update_cell(sudoku.x, sudoku.y, 8)
+                        sudoku.try_number(8)
                     if event.key == pygame.K_9:
-                        sudoku.game.update_cell(sudoku.x, sudoku.y, 9)
+                        sudoku.try_number(9)
                     if event.key == pygame.K_RETURN:# and pygame.key.get_mods() & pygame.KMOD_SHIFT:
                         sudoku.game.solvegame()
                     if event.key == pygame.K_ESCAPE:
-                        sudoku.board_id = 0
-                        sudoku.draw_status = max(0, sudoku.draw_status - 1)
+                        sudoku.reset_sudoku()
         if sudoku.draw_status == 0:
             sudoku.draw_title()
             sudoku.draw_difficulty()
