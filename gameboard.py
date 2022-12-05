@@ -1,12 +1,15 @@
+from boarddata import BoardData
 from copy import deepcopy
 
 class GameBoard:
-    user_board = []
-    question_board = []
-
     def __init__(self, board):
-        self.user_board = deepcopy(board)
-        self.question_board = deepcopy(board)
+        self.boards = BoardData().boards
+        self.user_board = deepcopy(self.boards[0][0])
+        self.question_board = deepcopy(self.boards[0][0])
+    
+    def select_board(self, diffculty, map_id):
+        self.user_board = deepcopy(self.boards[diffculty][map_id])
+        self.question_board = deepcopy(self.boards[diffculty][map_id])
     
     def update_cell(self, x, y, number):
         if number == 0:
