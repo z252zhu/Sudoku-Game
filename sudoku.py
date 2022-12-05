@@ -40,7 +40,7 @@ class Sudoku:
         self.box_background = pygame.Rect((0, 0, self.box, self.box))
     
     def draw_msg(self):
-        if time.time() - self.set_msg_timer < 2:
+        if time.time() - self.set_msg_timer < 5:
             text = self.msg_font.render(self.msg, 1, (0, 0, 0))
             self.main_window.blit(text, self.msg_pos)
     
@@ -170,18 +170,15 @@ class Sudoku:
                     self.main_window.blit(text, (j * self.cell + 26, i * self.cell + 20))
     
     def check_result(self):
-        if not self.game_finished:
-            if self.game.cells_left == 0 and self.not_auto_solve:
-                self.game_finished = True
-                self.msg = "You Win!"
-                self.set_msg_timer = time.time()
-            elif self.game.cells_left == 0:
-                self.game_finished = True
-                self.msg = "Game Finished!"
-                self.set_msg_timer = time.time()
-    
+        if self.draw_status == 2 and self.game.cells_left == 0:
+            self.draw_status += 1
+
     def solve_sudoku(self):
         self.not_auto_solve = False
+        self.game.solve_game()
+    
+    def cheat_sudoku(self):
+        # actually for debugging
         self.game.solve_game()
 
     def reset_sudoku(self):
@@ -199,6 +196,16 @@ class Sudoku:
         self.draw_background()
         self.draw_board()
         self.draw_selectbox()
+    
+    def draw_result(self):
+        self.main_window.fill((255,255,255))
+        self.draw_board()
+        if self.not_auto_solve:
+            msg = "You Win!"
+        else:
+            msg = "Game Finished!"
+        text = self.msg_font.render(msg, 1, (0, 0, 0))
+        self.main_window.blit(text, self.msg_pos)
 
 
 def main():
@@ -208,26 +215,27 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-            if sudoku.draw_status < 2:
+            if sudoku.draw_status == 0:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        sudoku.draw_status += 1
+                    if event.key == pygame.K_LEFT:
+                        sudoku.select_difficulty(-1)
+                    if event.key == pygame.K_RIGHT:
+                        sudoku.select_difficulty(1)
+            elif sudoku.draw_status == 1:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         sudoku.board_id = 0
-                        sudoku.draw_status = max(0, sudoku.draw_status - 1)
+                        sudoku.draw_status -= 1
                     if event.key == pygame.K_RETURN:
                         sudoku.draw_status += 1
-                        if sudoku.draw_status == 2:
-                            sudoku.game.select_board(sudoku.difficulty, sudoku.board_id)
+                        sudoku.game.select_board(sudoku.difficulty, sudoku.board_id)
                     if event.key == pygame.K_LEFT:
-                        if sudoku.draw_status == 0:
-                            sudoku.select_difficulty(-1)
-                        else:
-                            sudoku.select_board(-1)
+                        sudoku.select_board(-1)
                     if event.key == pygame.K_RIGHT:
-                        if sudoku.draw_status == 0:
-                            sudoku.select_difficulty(1)
-                        else:
-                            sudoku.select_board(1)
-            if sudoku.draw_status == 2:
+                        sudoku.select_board(1)
+            elif sudoku.draw_status == 2:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
                     sudoku.update_selection_box(pos[0], pos[1], True)
@@ -262,18 +270,29 @@ def main():
                         sudoku.try_number(9)
                     if event.key == pygame.K_s and pygame.key.get_mods() & pygame.KMOD_SHIFT:
                         sudoku.solve_sudoku()
+                    if event.key == pygame.K_RETURN and pygame.key.get_mods() & pygame.KMOD_SHIFT:
+                        sudoku.cheat_sudoku()
                     if event.key == pygame.K_r and pygame.key.get_mods() & pygame.KMOD_SHIFT:
                         sudoku.game.reset_board()
                     if event.key == pygame.K_ESCAPE:
                         sudoku.reset_sudoku()
+            else:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        sudoku.reset_sudoku()
+                    if event.key == pygame.K_r and pygame.key.get_mods() & pygame.KMOD_SHIFT:
+                        sudoku.draw_status = 2
+                        sudoku.game.reset_board()
         if sudoku.draw_status == 0:
             sudoku.draw_title()
             sudoku.draw_difficulty()
         elif sudoku.draw_status == 1:
             sudoku.draw_title()
             sudoku.draw_board_id()
-        else:
+        elif sudoku.draw_status == 2:
             sudoku.draw_sudoku()
+        else:
+            sudoku.draw_result()
         pygame.display.update()
     pygame.quit()
 
