@@ -16,6 +16,8 @@ class Sudoku:
         self.y = 0
         self.msg = ""
         self.set_msg_timer = 0
+        self.not_auto_solve = True
+        self.game_finished = False
         self.cell = int(BOARD_SIZE / 9)
         self.box = 3 * self.cell + 1
         self.msg_pos = (10, BOARD_SIZE + 15)
@@ -38,7 +40,7 @@ class Sudoku:
         self.box_background = pygame.Rect((0, 0, self.box, self.box))
     
     def draw_msg(self):
-        if time.time() - self.set_msg_timer < 5:
+        if time.time() - self.set_msg_timer < 2:
             text = self.msg_font.render(self.msg, 1, (0, 0, 0))
             self.main_window.blit(text, self.msg_pos)
     
@@ -91,7 +93,7 @@ class Sudoku:
     def update_selection_box(self, x, y, mouse_input):
         # mouse input
         if mouse_input:
-            if x < BOARD_SIZE and x < BOARD_SIZE:
+            if x < BOARD_SIZE and y < BOARD_SIZE:
                 self.x = int(x // self.cell)
                 self.y = int(y // self.cell)
         # keyboard input
@@ -127,7 +129,7 @@ class Sudoku:
             self.game.user_board[self.y][self.x] != 0):
             self.msg = "Choose a different cell."
             self.set_msg_timer = time.time()
-        elif not self.game.validvalue(self.y, self.x, number):
+        elif not self.game.valid_value(self.y, self.x, number):
             self.msg = "Invalid number."
             self.set_msg_timer = time.time()
         else:
@@ -166,7 +168,22 @@ class Sudoku:
                         color = (10, 100, 200)
                     text = self.number_font.render(str(self.game.user_board[i][j]), 1, color)
                     self.main_window.blit(text, (j * self.cell + 26, i * self.cell + 20))
-        
+    
+    def check_result(self):
+        if not self.game_finished:
+            if self.game.cells_left == 0 and self.not_auto_solve:
+                self.game_finished = True
+                self.msg = "You Win!"
+                self.set_msg_timer = time.time()
+            elif self.game.cells_left == 0:
+                self.game_finished = True
+                self.msg = "Game Finished!"
+                self.set_msg_timer = time.time()
+    
+    def solve_sudoku(self):
+        self.not_auto_solve = False
+        self.game.solve_game()
+
     def reset_sudoku(self):
         self.difficulty = 0
         self.board_id = 0
@@ -174,6 +191,15 @@ class Sudoku:
         self.max_board_id = len(self.game.boards[self.difficulty])
         self.x = 0
         self.y = 0
+        self.not_auto_solve = True
+        self.game_finished = False
+    
+    def draw_sudoku(self):
+        self.check_result()
+        self.draw_background()
+        self.draw_board()
+        self.draw_selectbox()
+
 
 def main():
     sudoku = Sudoku()
@@ -201,7 +227,7 @@ def main():
                             sudoku.select_difficulty(1)
                         else:
                             sudoku.select_board(1)
-            else:
+            if sudoku.draw_status == 2:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
                     sudoku.update_selection_box(pos[0], pos[1], True)
@@ -234,8 +260,8 @@ def main():
                         sudoku.try_number(8)
                     if event.key == pygame.K_9:
                         sudoku.try_number(9)
-                    if event.key == pygame.K_RETURN:
-                        sudoku.game.solvegame()
+                    if event.key == pygame.K_s and pygame.key.get_mods() & pygame.KMOD_SHIFT:
+                        sudoku.solve_sudoku()
                     if event.key == pygame.K_r and pygame.key.get_mods() & pygame.KMOD_SHIFT:
                         sudoku.game.reset_board()
                     if event.key == pygame.K_ESCAPE:
@@ -247,9 +273,7 @@ def main():
             sudoku.draw_title()
             sudoku.draw_board_id()
         else:
-            sudoku.draw_background()
-            sudoku.draw_board()
-            sudoku.draw_selectbox()
+            sudoku.draw_sudoku()
         pygame.display.update()
     pygame.quit()
 
