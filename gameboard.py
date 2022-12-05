@@ -2,7 +2,7 @@ from boarddata import BoardData
 from copy import deepcopy
 
 class GameBoard:
-    def __init__(self, board):
+    def __init__(self):
         self.boards = BoardData().boards
         self.user_board = deepcopy(self.boards[0][0])
         self.question_board = deepcopy(self.boards[0][0])
