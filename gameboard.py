@@ -7,9 +7,9 @@ class GameBoard:
         self.user_board = deepcopy(self.boards[0][0])
         self.question_board = deepcopy(self.boards[0][0])
     
-    def select_board(self, diffculty, map_id):
-        self.user_board = deepcopy(self.boards[diffculty][map_id])
-        self.question_board = deepcopy(self.boards[diffculty][map_id])
+    def select_board(self, diffculty, board_id):
+        self.user_board = deepcopy(self.boards[diffculty][board_id])
+        self.question_board = deepcopy(self.boards[diffculty][board_id])
     
     def update_cell(self, x, y, number):
         if number == 0:
