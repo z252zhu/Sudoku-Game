@@ -12,6 +12,7 @@ class Sudoku:
         self.y = 0
         self.cell = int(BOARD_SIZE / 9)
         self.box = 3 * self.cell + 1
+        self.msg_pos = (10, BOARD_SIZE + 15)
 
         # initiate pygame
         pygame.font.init()
@@ -30,6 +31,38 @@ class Sudoku:
         self.v_background = pygame.Rect((0, 0, BOARD_SIZE, self.cell + 1))
         self.cell_background = pygame.Rect((0, 0, self.cell + 1, self.cell + 1))
         self.box_background = pygame.Rect((0, 0, self.box, self.box))
+    
+    def draw_title(self):
+        # game title
+        game_title = self.title_font.render("Sudoku Game", 1, (0, 0, 0))
+        self.main_window.blit(game_title, (120, 200))
+        # selection hint
+        hint = self.display_font.render("Press ENTER to select: ", 1, (0, 0, 0))
+        self.main_window.blit(hint, (10, 470))
+    
+    def select_difficulty(self, diffculty_i):
+        # draw difficulty selection
+        difficulty = ["EASY", "MEDIUM", "HARD", "EXPERT", "EVIL"]
+        if diffculty_i == 0: 
+            msg = " " * 4 + difficulty[diffculty_i] + " ->"
+        elif diffculty_i in range(1, 4):
+            msg = "<- " + difficulty[diffculty_i] + " ->"
+        else:
+            msg = "<- " + difficulty[diffculty_i]
+        text = self.display_font.render(msg, 1, (0, 0, 0))
+        self.main_window.blit(text, self.msg_pos)
+
+    def select_map_id(self, board_id):
+        # board selection
+        numberStr = str(boardNumber + 1)
+        if boardNumber == 0: 
+            msg = " " * 4 + numberStr + " ->"
+        elif 1 <= boardNumber and boardNumber <= boardNumber_max - 1: 
+            msg = "<- " + numberStr + " ->"
+        else: 
+            msg = "<- " + numberStr + " " * 4
+        text = displayFont.render(msg, 1, (0, 0, 0))
+        sudokuInterface.blit(text, msg_pos)
     
     def mouse_pos(self, pos):
         if pos[0] < BOARD_SIZE and pos[1] < BOARD_SIZE:
