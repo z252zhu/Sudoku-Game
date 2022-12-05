@@ -6,12 +6,13 @@ from copy import deepcopy
 BOARD_SIZE = 630
 
 class Sudoku:
-    x = 0
-    y = 0
-    cell = int(BOARD_SIZE / 9)
-    box = 3 * cell + 1
-
     def __init__(self, board):
+        # set up basic game parameters
+        self.x = 0
+        self.y = 0
+        self.cell = int(BOARD_SIZE / 9)
+        self.box = 3 * self.cell + 1
+
         # initiate pygame
         pygame.font.init()
         self.number_font = pygame.font.SysFont("Helvetica", 35)
