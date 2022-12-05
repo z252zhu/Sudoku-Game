@@ -215,84 +215,86 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-            if sudoku.draw_status == 0:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RETURN:
-                        sudoku.draw_status += 1
-                    if event.key == pygame.K_LEFT:
-                        sudoku.select_difficulty(-1)
-                    if event.key == pygame.K_RIGHT:
-                        sudoku.select_difficulty(1)
-            elif sudoku.draw_status == 1:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        sudoku.board_id = 0
-                        sudoku.draw_status -= 1
-                    if event.key == pygame.K_RETURN:
-                        sudoku.draw_status += 1
-                        sudoku.game.select_board(sudoku.difficulty, sudoku.board_id)
-                    if event.key == pygame.K_LEFT:
-                        sudoku.select_board(-1)
-                    if event.key == pygame.K_RIGHT:
-                        sudoku.select_board(1)
-            elif sudoku.draw_status == 2:
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    pos = pygame.mouse.get_pos()
-                    sudoku.update_selection_box(pos[0], pos[1], True)
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_LEFT:
-                        sudoku.update_selection_box(-1, 0, False)
-                    if event.key == pygame.K_RIGHT:
-                        sudoku.update_selection_box(1, 0, False)
-                    if event.key == pygame.K_UP:
-                        sudoku.update_selection_box(0, -1, False)
-                    if event.key == pygame.K_DOWN:
-                        sudoku.update_selection_box(0, 1, False)
-                    if event.key == pygame.K_BACKSPACE:
-                        sudoku.game.update_cell(sudoku.x, sudoku.y, 0)
-                    if event.key == pygame.K_1:
-                        sudoku.try_number(1)
-                    if event.key == pygame.K_2:
-                        sudoku.try_number(2)
-                    if event.key == pygame.K_3:
-                        sudoku.try_number(3)
-                    if event.key == pygame.K_4:
-                        sudoku.try_number(4)
-                    if event.key == pygame.K_5:
-                        sudoku.try_number(5)
-                    if event.key == pygame.K_6:
-                        sudoku.try_number(6)
-                    if event.key == pygame.K_7:
-                        sudoku.try_number(7)
-                    if event.key == pygame.K_8:
-                        sudoku.try_number(8)
-                    if event.key == pygame.K_9:
-                        sudoku.try_number(9)
-                    if event.key == pygame.K_s and pygame.key.get_mods() & pygame.KMOD_SHIFT:
-                        sudoku.solve_sudoku()
-                    if event.key == pygame.K_RETURN and pygame.key.get_mods() & pygame.KMOD_SHIFT:
-                        sudoku.cheat_sudoku()
-                    if event.key == pygame.K_r and pygame.key.get_mods() & pygame.KMOD_SHIFT:
-                        sudoku.game.reset_board()
-                    if event.key == pygame.K_ESCAPE:
-                        sudoku.reset_sudoku()
-            else:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        sudoku.reset_sudoku()
-                    if event.key == pygame.K_r and pygame.key.get_mods() & pygame.KMOD_SHIFT:
-                        sudoku.draw_status = 2
-                        sudoku.game.reset_board()
-        if sudoku.draw_status == 0:
-            sudoku.draw_title()
-            sudoku.draw_difficulty()
-        elif sudoku.draw_status == 1:
-            sudoku.draw_title()
-            sudoku.draw_board_id()
-        elif sudoku.draw_status == 2:
-            sudoku.draw_sudoku()
-        else:
-            sudoku.draw_result()
+            match sudoku.draw_status:
+                case 0:
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_RETURN:
+                            sudoku.draw_status += 1
+                        if event.key == pygame.K_LEFT:
+                            sudoku.select_difficulty(-1)
+                        if event.key == pygame.K_RIGHT:
+                            sudoku.select_difficulty(1)
+                case 1:
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            sudoku.board_id = 0
+                            sudoku.draw_status -= 1
+                        if event.key == pygame.K_RETURN:
+                            sudoku.draw_status += 1
+                            sudoku.game.select_board(sudoku.difficulty, sudoku.board_id)
+                        if event.key == pygame.K_LEFT:
+                            sudoku.select_board(-1)
+                        if event.key == pygame.K_RIGHT:
+                            sudoku.select_board(1)
+                case 2:
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        pos = pygame.mouse.get_pos()
+                        sudoku.update_selection_box(pos[0], pos[1], True)
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_LEFT:
+                            sudoku.update_selection_box(-1, 0, False)
+                        if event.key == pygame.K_RIGHT:
+                            sudoku.update_selection_box(1, 0, False)
+                        if event.key == pygame.K_UP:
+                            sudoku.update_selection_box(0, -1, False)
+                        if event.key == pygame.K_DOWN:
+                            sudoku.update_selection_box(0, 1, False)
+                        if event.key == pygame.K_BACKSPACE:
+                            sudoku.game.update_cell(sudoku.x, sudoku.y, 0)
+                        if event.key == pygame.K_1:
+                            sudoku.try_number(1)
+                        if event.key == pygame.K_2:
+                            sudoku.try_number(2)
+                        if event.key == pygame.K_3:
+                            sudoku.try_number(3)
+                        if event.key == pygame.K_4:
+                            sudoku.try_number(4)
+                        if event.key == pygame.K_5:
+                            sudoku.try_number(5)
+                        if event.key == pygame.K_6:
+                            sudoku.try_number(6)
+                        if event.key == pygame.K_7:
+                            sudoku.try_number(7)
+                        if event.key == pygame.K_8:
+                            sudoku.try_number(8)
+                        if event.key == pygame.K_9:
+                            sudoku.try_number(9)
+                        if event.key == pygame.K_s and pygame.key.get_mods() & pygame.KMOD_SHIFT:
+                            sudoku.solve_sudoku()
+                        if event.key == pygame.K_RETURN and pygame.key.get_mods() & pygame.KMOD_SHIFT:
+                            sudoku.cheat_sudoku()
+                        if event.key == pygame.K_r and pygame.key.get_mods() & pygame.KMOD_SHIFT:
+                            sudoku.game.reset_board()
+                        if event.key == pygame.K_ESCAPE:
+                            sudoku.reset_sudoku()
+                case 3:
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            sudoku.reset_sudoku()
+                        if event.key == pygame.K_r and pygame.key.get_mods() & pygame.KMOD_SHIFT:
+                            sudoku.draw_status = 2
+                            sudoku.game.reset_board()
+        match sudoku.draw_status:
+            case 0:
+                sudoku.draw_title()
+                sudoku.draw_difficulty()
+            case 1:
+                sudoku.draw_title()
+                sudoku.draw_board_id()
+            case 2:
+                sudoku.draw_sudoku()
+            case 3:
+                sudoku.draw_result()
         pygame.display.update()
     pygame.quit()
 
