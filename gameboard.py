@@ -17,11 +17,14 @@ class GameBoard:
         if self.question_board[y][x] == 0 and self.user_board[y][x] == 0:
             self.user_board[y][x] = number
     
-    def validvalue(self, r, c, x): 
-        if x in self.user_board[r]: 
+    def validvalue(self, r, c, x):
+        if x == 0:
+            return True
+        
+        if x in self.user_board[r]:
             return False
                     
-        for row in self.user_board: 
+        for row in self.user_board:
             if row[c] == x: 
                 return False
             
