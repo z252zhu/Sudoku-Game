@@ -190,7 +190,23 @@ class Sudoku:
         self.y = 0
         self.not_auto_solve = True
         self.game_finished = False
-    
+
+        # update selection box
+        self.selectbox.x = 0
+        self.selectbox.y = 0
+        # update horizontal background
+        self.h_background.x = 0
+        self.h_background.y = 0
+        # update vertical background
+        self.v_background.x = 0
+        self.v_background.y = 0
+        # update box background
+        self.box_background.x = 0
+        self.box_background.y = 0
+        # update cell background
+        self.cell_background.x = 0
+        self.cell_background.y = 0
+
     def draw_sudoku(self):
         self.check_result()
         self.draw_background()
