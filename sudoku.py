@@ -225,8 +225,10 @@ def main():
                         sudoku.try_number(8)
                     if event.key == pygame.K_9:
                         sudoku.try_number(9)
-                    if event.key == pygame.K_RETURN:# and pygame.key.get_mods() & pygame.KMOD_SHIFT:
+                    if event.key == pygame.K_RETURN:
                         sudoku.game.solvegame()
+                    if event.key == pygame.K_r and pygame.key.get_mods() & pygame.KMOD_SHIFT:
+                        sudoku.game.reset_board()
                     if event.key == pygame.K_ESCAPE:
                         sudoku.reset_sudoku()
         if sudoku.draw_status == 0:

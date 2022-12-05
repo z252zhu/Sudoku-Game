@@ -58,6 +58,9 @@ class GameBoard:
 
         return solve()
     
+    def reset_board(self):
+        self.user_board = deepcopy(self.question_board)
+    
     def print(self):
         for r in self.user_board:
             print(r)
