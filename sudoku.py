@@ -195,7 +195,7 @@ class Sudoku:
         for i in range(9): 
             for j in range(9): 
                 if self.game.note_board[i][j]:
-                    color = (150, 150, 150)
+                    color = (50, 50, 50)
                     row_n, col_n = 0, 0
                     for n in self.game.note_board[i][j]:
                         text = self.number_font2.render(str(n), 1, color)
