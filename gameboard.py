@@ -6,6 +6,7 @@ class GameBoard:
         self.boards = BoardData().boards
         self.user_board = []
         self.question_board = []
+        self.note_board = [[] for i in range(81)]
         self.cells_left = 81
     
     def get_cells_left(self):
@@ -29,7 +30,18 @@ class GameBoard:
             self.cells_left += 1
         if self.question_board[y][x] == 0 and self.user_board[y][x] == 0:
             self.user_board[y][x] = number
+            self.note_board[y][x].clear()
             self.cells_left -= 1
+    
+    def update_note(self, x, y, number):
+        if (self.question_board[y][x] == 0 and 
+            self.user_board[y][x] != 0):
+            if number in self.note_board[y][x]:
+                self.note_board[y][x].remove(number)
+            else:
+                self.note_board[y][x].append(number)
+            return True
+        return False
     
     def valid_value(self, r, c, x):
         if x == 0:
