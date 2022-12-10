@@ -1,5 +1,6 @@
 from boarddata import BoardData
 from copy import deepcopy
+import bisect
 
 class GameBoard:
     def __init__(self):
@@ -39,7 +40,7 @@ class GameBoard:
             if number in self.note_board[y][x]:
                 self.note_board[y][x].remove(number)
             else:
-                self.note_board[y][x].append(number)
+                bisect.insort(self.note_board[y][x], number)
             return True
         return False
     

@@ -135,6 +135,11 @@ class Sudoku:
         else:
             self.game.update_cell(self.x, self.y, number)
     
+    def try_note(self, number):
+        if not self.game.update_note(self.y, self.x, number):
+            self.msg = "Choose a different cell."
+            self.set_msg_timer = time.time()
+    
     def draw_selectbox(self):
         pygame.draw.rect(self.main_window, (0, 0, 0), self.selectbox, 1)
     
@@ -166,6 +171,12 @@ class Sudoku:
                         color = (0, 0, 0)
                     else: 
                         color = (10, 100, 200)
+                    text = self.number_font.render(str(self.game.user_board[i][j]), 1, color)
+                    self.main_window.blit(text, (j * self.cell + 26, i * self.cell + 20))
+        for i in range(9): 
+            for j in range(9): 
+                if not self.game.note_board[i][j]:
+                    color = (10, 100, 200)
                     text = self.number_font.render(str(self.game.user_board[i][j]), 1, color)
                     self.main_window.blit(text, (j * self.cell + 26, i * self.cell + 20))
     
