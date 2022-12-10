@@ -20,11 +20,14 @@ class Sudoku:
         self.game_finished = False
         self.cell = int(BOARD_SIZE / 9)
         self.box = 3 * self.cell + 1
-        self.msg_pos = (10, BOARD_SIZE + 15)
+        self.msg_pos1 = (10, BOARD_SIZE + 15)
+        self.msg_pos2 = (BOARD_SIZE - 200, BOARD_SIZE + 15)
+        self.mode_note = False
 
         # initiate pygame
         pygame.font.init()
-        self.number_font = pygame.font.SysFont("Helvetica", 35)
+        self.number_font1 = pygame.font.SysFont("Helvetica", 35)
+        self.number_font2 = pygame.font.SysFont("Helvetica", 20)
         self.msg_font = pygame.font.SysFont("Helvetica", 20, bold = True)
         self.title_font = pygame.font.SysFont("Helvetica", 50, bold = True)
         self.main_window = pygame.display.set_mode((BOARD_SIZE + 2, BOARD_SIZE + 50))
@@ -42,7 +45,7 @@ class Sudoku:
     def draw_msg(self):
         if time.time() - self.set_msg_timer < 5:
             text = self.msg_font.render(self.msg, 1, (0, 0, 0))
-            self.main_window.blit(text, self.msg_pos)
+            self.main_window.blit(text, self.msg_pos1)
     
     def draw_title(self):
         self.main_window.fill((255,255,255))
@@ -69,11 +72,19 @@ class Sudoku:
         else:
             msg = "<- " + str_difficulty[self.difficulty]
         text = self.msg_font.render(msg, 1, (0, 0, 0))
-        self.main_window.blit(text, self.msg_pos)
+        self.main_window.blit(text, self.msg_pos1)
+    
+    def draw_mode_note_status(self):
+        if self.mode_note:
+            msg = "Take Notes: ON"
+        else:
+            msg = "Take Notes: OFF"
+        text = self.msg_font.render(msg, 1, (0, 0, 0))
+        self.main_window.blit(text, self.msg_pos2)
 
     def select_board(self, selection):
         self.board_id += selection
-        self.max_board_id = len(self.game.boards[self.difficulty])
+        self.max_board_id = len(self.game.boards[self.difficulty]) - 1
         if self.board_id < 0:
             self.board_id = 0
         elif self.board_id > self.max_board_id - 1:
@@ -88,7 +99,14 @@ class Sudoku:
         else:
             msg = "<- " + str_board_id
         text = self.msg_font.render(msg, 1, (0, 0, 0))
-        self.main_window.blit(text, self.msg_pos)
+        self.main_window.blit(text, self.msg_pos1)
+    
+    def switch_mode_note(self):
+        if self.mode_note:
+            self.mode_note = False
+        else:
+            self.mode_note = True
+        print(self.mode_note)
     
     def update_selection_box(self, x, y, mouse_input):
         # mouse input
@@ -136,9 +154,10 @@ class Sudoku:
             self.game.update_cell(self.x, self.y, number)
     
     def try_note(self, number):
-        if not self.game.update_note(self.y, self.x, number):
+        if not self.game.update_note(self.x, self.y, number):
             self.msg = "Choose a different cell."
             self.set_msg_timer = time.time()
+        print(self.x, self.y, self.game.note_board[self.y][self.x])
     
     def draw_selectbox(self):
         pygame.draw.rect(self.main_window, (0, 0, 0), self.selectbox, 1)
@@ -171,14 +190,23 @@ class Sudoku:
                         color = (0, 0, 0)
                     else: 
                         color = (10, 100, 200)
-                    text = self.number_font.render(str(self.game.user_board[i][j]), 1, color)
+                    text = self.number_font1.render(str(self.game.user_board[i][j]), 1, color)
                     self.main_window.blit(text, (j * self.cell + 26, i * self.cell + 20))
         for i in range(9): 
             for j in range(9): 
-                if not self.game.note_board[i][j]:
-                    color = (10, 100, 200)
-                    text = self.number_font.render(str(self.game.user_board[i][j]), 1, color)
-                    self.main_window.blit(text, (j * self.cell + 26, i * self.cell + 20))
+                if self.game.note_board[i][j]:
+                    color = (150, 150, 150)
+                    row_n, col_n = 0, 0
+                    for n in self.game.note_board[i][j]:
+                        text = self.number_font2.render(str(n), 1, color)
+                        pos_x = j * self.cell + row_n * 24 + 5
+                        pos_y = i * self.cell + col_n * 22 + 5
+                        self.main_window.blit(text, (pos_x, pos_y))
+                        row_n += 1
+                        if row_n == 3:
+                            row_n = 0
+                            col_n += 1
+
     
     def check_result(self):
         if self.draw_status == 2 and self.game.cells_left == 0:
@@ -223,6 +251,7 @@ class Sudoku:
         self.draw_background()
         self.draw_board()
         self.draw_selectbox()
+        self.draw_mode_note_status()
     
     def draw_result(self):
         self.main_window.fill((255,255,255))
@@ -232,7 +261,7 @@ class Sudoku:
         else:
             msg = "Game Finished!"
         text = self.msg_font.render(msg, 1, (0, 0, 0))
-        self.main_window.blit(text, self.msg_pos)
+        self.main_window.blit(text, self.msg_pos1)
 
 
 def main():
@@ -278,24 +307,26 @@ def main():
                             sudoku.update_selection_box(0, 1, False)
                         if event.key == pygame.K_BACKSPACE:
                             sudoku.game.update_cell(sudoku.x, sudoku.y, 0)
+                        if event.key == pygame.K_TAB:
+                            sudoku.switch_mode_note()
                         if event.key == pygame.K_1:
-                            sudoku.try_number(1)
+                            sudoku.try_note(1) if sudoku.mode_note else sudoku.try_number(1)
                         if event.key == pygame.K_2:
-                            sudoku.try_number(2)
+                            sudoku.try_note(2) if sudoku.mode_note else sudoku.try_number(2)
                         if event.key == pygame.K_3:
-                            sudoku.try_number(3)
+                            sudoku.try_note(3) if sudoku.mode_note else sudoku.try_number(3)
                         if event.key == pygame.K_4:
-                            sudoku.try_number(4)
+                            sudoku.try_note(4) if sudoku.mode_note else sudoku.try_number(4)
                         if event.key == pygame.K_5:
-                            sudoku.try_number(5)
+                            sudoku.try_note(5) if sudoku.mode_note else sudoku.try_number(5)
                         if event.key == pygame.K_6:
-                            sudoku.try_number(6)
+                            sudoku.try_note(6) if sudoku.mode_note else sudoku.try_number(6)
                         if event.key == pygame.K_7:
-                            sudoku.try_number(7)
+                            sudoku.try_note(7) if sudoku.mode_note else sudoku.try_number(7)
                         if event.key == pygame.K_8:
-                            sudoku.try_number(8)
+                            sudoku.try_note(8) if sudoku.mode_note else sudoku.try_number(8)
                         if event.key == pygame.K_9:
-                            sudoku.try_number(9)
+                            sudoku.try_note(9) if sudoku.mode_note else sudoku.try_number(9)
                         if event.key == pygame.K_s and pygame.key.get_mods() & pygame.KMOD_SHIFT:
                             sudoku.solve_sudoku()
                         if event.key == pygame.K_RETURN and pygame.key.get_mods() & pygame.KMOD_SHIFT:
