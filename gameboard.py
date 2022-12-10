@@ -63,6 +63,7 @@ class GameBoard:
     
     def solve_game(self):
         self.cells_left = 0
+        self.note_board = [[[] for i in range(9)] for j in range(9)]
 
         def find_unassign():
             for r in range(9):
