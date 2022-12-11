@@ -207,7 +207,6 @@ class Sudoku:
                         if row_n == 3:
                             row_n = 0
                             col_n += 1
-
     
     def check_result(self):
         if self.draw_status == 2 and self.game.cells_left == 0:
