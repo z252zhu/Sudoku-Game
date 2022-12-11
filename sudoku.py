@@ -197,11 +197,12 @@ class Sudoku:
                 if self.game.note_board[i][j]:
                     color = (50, 50, 50)
                     row_n, col_n = 0, 0
-                    for n in self.game.note_board[i][j]:
-                        text = self.number_font2.render(str(n), 1, color)
-                        pos_x = j * self.cell + row_n * 24 + 5
-                        pos_y = i * self.cell + col_n * 22 + 5
-                        self.main_window.blit(text, (pos_x, pos_y))
+                    for n in range(1, 10):
+                        if n in self.game.note_board[i][j]:
+                            text = self.number_font2.render(str(n), 1, color)
+                            pos_x = j * self.cell + row_n * 24 + 5
+                            pos_y = i * self.cell + col_n * 22 + 5
+                            self.main_window.blit(text, (pos_x, pos_y))
                         row_n += 1
                         if row_n == 3:
                             row_n = 0
